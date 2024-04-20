@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling >= 1.13.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fantasie"
+description = "Restful API study project for costume rental."
+readme = "README.md"
+requires-python = ">=3.11.4"
+authors = [
+    { name = "Matheus Vinícius", email = "matheusvialves@outlook.com" },
+]
+
+[tool.pytest.ini_options]
+pythonpath = "."
+
+[tool.taskipy.tasks]
+run = 'uvicorn fantasie.main:app --reload'
+test = 'pytest -s -x --cov=todo -vv'
+post_test = 'coverage html'
