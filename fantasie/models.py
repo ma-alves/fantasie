@@ -9,20 +9,21 @@ from sqlalchemy.orm import (
     relationship
 )
 
+
 class Base(DeclarativeBase):
     pass
 
 
-class Employee(Base):
-    __tablename__ = 'employees'
+class Costume(Base):
+    __tablename__ = 'costumes'
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
-    email: Mapped[str]
-    password: Mapped[str]
-    phone_number: Mapped[Optional[str]] = mapped_column(String(11))
+    description: Mapped[str]
+    fee: Mapped[float]
+    available: Mapped[bool]
 
-    rental: Mapped[List["Rental"]] = relationship(back_populates='employees')
+    rental: Mapped[List["Rental"]] = relationship(back_populates='costumes')
 
 
 class Customer(Base):
@@ -38,16 +39,16 @@ class Customer(Base):
     rental: Mapped[List["Rental"]] = relationship(back_populates='customers')
 
 
-class Costume(Base):
-    __tablename__ = 'costumes'
+class Employee(Base):
+    __tablename__ = 'employees'
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
-    description: Mapped[str]
-    fee: Mapped[float]
-    available: Mapped[bool]
+    email: Mapped[str]
+    password: Mapped[str]
+    phone_number: Mapped[Optional[str]] = mapped_column(String(11))
 
-    rental: Mapped[List["Rental"]] = relationship(back_populates='costumes')
+    rental: Mapped[List["Rental"]] = relationship(back_populates='employees')
 
 
 class Rental(Base):

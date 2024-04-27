@@ -16,5 +16,5 @@ pythonpath = "."
 
 [tool.taskipy.tasks]
 run = 'uvicorn fantasie.main:app --reload'
-test = 'pytest -s -x --cov=todo -vv'
+test = 'pytest -s -x --cov=fantasie -vv'
 post_test = 'coverage html'
