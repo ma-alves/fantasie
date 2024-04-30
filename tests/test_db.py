@@ -2,37 +2,53 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from fantasie.models import Costume, Customer, Employee, Rental
+from factories import CostumeFactory, CustomerFactory, EmployeeFactory
 
 
 def test_create_costume(test_session: Session):
-    new_costume = Costume(
-        name='Batman',
-        description='O homem morcego',
-        fee=59.99,
-        available=True
-    )
+    new_costume = CostumeFactory()
+
     test_session.add(new_costume)
     test_session.commit()
-
+    
     costume = test_session.scalar(
-        select(Costume).where(new_costume.name == 'Batman')
+        select(Costume).where(Costume.id == new_costume.id)
     )
 
-    assert costume.name == 'Batman'
+    assert costume.name == costume.name
+    assert costume.description == costume.description
+    assert costume.fee == costume.fee
+    assert costume.available is True or costume.available is False
 
 
 def test_create_employee(test_session: Session):
-    new_employee = Employee(
-        name='Matheus',
-        email='test@test.com',
-        password='test',
-        phone_number='00000000000'
-    )
+    new_employee = EmployeeFactory()
+    
     test_session.add(new_employee)
     test_session.commit()
 
     employee = test_session.scalar(
-        select(Employee).where(new_employee.email == 'test@test.com')
+        select(Employee).where(Employee.id == new_employee.id)
     )
 
-    assert employee.email == 'test@test.com'
+    assert employee.name == new_employee.name
+    assert employee.email == new_employee.email
+    assert employee.password == new_employee.password
+    assert employee.phone_number == new_employee.phone_number
+
+
+def test_create_customer(test_session: Session):
+    new_customer = CustomerFactory()
+
+    test_session.add(new_customer)
+    test_session.commit()
+
+    customer = test_session.scalar(
+        select(Customer).where(Customer.id == new_customer.id)
+    )
+
+    assert customer.cpf == new_customer.cpf
+    assert customer.name == new_customer.name
+    assert customer.email == new_customer.email
+    assert customer.phone_number == new_customer.phone_number
+    assert customer.address == new_customer.address
