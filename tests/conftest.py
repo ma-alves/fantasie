@@ -7,7 +7,7 @@ from sqlalchemy.pool import StaticPool
 
 from fantasie.database import get_session
 from fantasie.main import app
-from fantasie.models import Base, Employee
+from fantasie.models import Base
 from fantasie.security import get_password_hash
 
 from factories import EmployeeFactory

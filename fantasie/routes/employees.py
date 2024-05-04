@@ -7,15 +7,16 @@ from fantasie.schemas import (
     EmployeeList,
     EmployeeOutput
 )
-from fantasie.security import get_password_hash
+from fantasie.security import get_password_hash, get_current_employee
 
 from fastapi import APIRouter,Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-
-SessionDep = Annotated[Session, Depends(get_session)]
 router = APIRouter(prefix='/employees', tags=['employees'])
+
+CurrentEmployee = Annotated[Employee, Depends(get_current_employee)]
+SessionDep = Annotated[Session, Depends(get_session)]
 
 
 @router.get('/', response_model=EmployeeList)
@@ -61,3 +62,22 @@ def create_employee(employee: EmployeeInput, session: SessionDep):
 
     return db_employee
 
+
+@router.put('/{employee_id}', response_model=EmployeeOutput)
+def update_employee(
+    current_employee: CurrentEmployee,
+    session: SessionDep,
+    employee: EmployeeInput,
+    employee_id: str,
+):
+    if current_employee.id != employee_id:
+        raise HTTPException(status_code=400, detail='Not enough permissions')
+
+    current_employee.name = employee.name
+    current_employee.password = get_password_hash(employee.password)
+    current_employee.email = employee.email
+    current_employee.phone_number = employee.phone_number
+    session.commit()
+    session.refresh(current_employee)
+
+    return current_employee
