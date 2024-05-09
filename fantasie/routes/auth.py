@@ -19,10 +19,10 @@ SessionDep = Annotated[Session, Depends(get_session)]
 router = APIRouter(prefix='/auth', tags=['auth'])
 
 
-@router.post('/', response_model=Token)
+@router.post('/token', response_model=Token)
 def login_for_access_token(form_data: OAuth2Password, session: SessionDep):
     employee = session.scalar(
-        select(Employee).where(Employee.email == form_data.email)
+        select(Employee).where(Employee.email == form_data.username)
     )
 
     if not employee:

@@ -29,14 +29,14 @@ def verify_password_hash(plain_password: str, hashed_password: str):
 
 def create_access_token(data: dict):
     to_encode = data.copy()
-    expire = datetime.now(tz=ZoneInfo('UTC')) + timedelta(
+    expire = datetime.utcnow() + timedelta(
         days=settings.ACCESS_TOKEN_EXPIRE_DAYS
     )
     to_encode.update({'exp': expire})
     encoded_jwt = encode(
         payload=to_encode,
         key=settings.SECRET_KEY,
-        algorithm=[settings.ALGORITHM]
+        algorithm=settings.ALGORITHM
     )
 
     return encoded_jwt
@@ -56,7 +56,7 @@ async def get_current_employee(
         payload = decode(
             jwt=token,
             key=settings.SECRET_KEY,
-            algorithms=[settings.ALGORITHM]
+            algorithms=settings.ALGORITHM
         )
         email = payload.get('sub')
         if not email:

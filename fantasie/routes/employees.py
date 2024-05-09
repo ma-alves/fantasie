@@ -5,7 +5,8 @@ from fantasie.models import Employee
 from fantasie.schemas import (
     EmployeeInput,
     EmployeeList,
-    EmployeeOutput
+    EmployeeOutput,
+    Message
 )
 from fantasie.security import get_password_hash, get_current_employee
 
@@ -68,7 +69,7 @@ def update_employee(
     current_employee: CurrentEmployee,
     session: SessionDep,
     employee: EmployeeInput,
-    employee_id: str,
+    employee_id: int,
 ):
     if current_employee.id != employee_id:
         raise HTTPException(status_code=400, detail='Not enough permissions')
@@ -81,3 +82,18 @@ def update_employee(
     session.refresh(current_employee)
 
     return current_employee
+
+
+@router.delete('/{employee_id}', response_model=Message)
+def delete_employee(
+    current_employee: CurrentEmployee,
+    session: SessionDep,
+    employee_id: int,
+):
+    if current_employee.id != employee_id:
+        raise HTTPException(status_code=400, detail='Not enough permissions')
+    
+    session.delete(current_employee)
+    session.commit()
+
+    return {'message': 'Employee deleted.'}
