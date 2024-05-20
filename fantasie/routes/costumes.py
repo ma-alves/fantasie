@@ -1,0 +1,101 @@
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from fantasie.database import get_session
+from fantasie.models import CostumeAvailability, Costume, Employee
+from fantasie.schemas import (
+    CostumeInput,
+    CostumeList,
+    CostumeOutput,
+    Message
+)
+from fantasie.security import get_current_employee
+
+
+router = APIRouter(prefix='/costumes', tags=['costumes'])
+
+CurrentEmployee = Annotated[Employee, Depends(get_current_employee)]
+SessionDep = Annotated[Session, Depends(get_session)]
+
+
+@router.get('/', response_model=CostumeList)
+def get_costumes(
+    session: SessionDep,
+    availability: CostumeAvailability = Query(None),
+    skip: int = Query(None),
+    limit: int = Query(None),
+    ):
+    query = select(Costume)
+
+    if availability:
+        query = query.filter(Costume.availability == availability)
+    
+    costumes = session.scalars(query.offset(skip).limit(limit)).all()
+
+    return {'costumes': costumes}
+
+
+@router.get('/{costume_id}', response_model=CostumeOutput)
+def get_costume(session: SessionDep, costume_id: int):
+    costume = session.scalar(
+        select(Costume).where(Costume.id == costume_id)
+    )
+
+    if not costume:
+        raise HTTPException(404, detail='Costume not registered.')
+
+    return costume
+
+
+@router.post('/', response_model=CostumeOutput, status_code=201)
+def create_costume(
+    session: SessionDep,
+    current_employee: CurrentEmployee,
+    costume: CostumeInput
+):
+    db_costume = session.scalar(
+        select(Costume).where(Costume.name == costume.name)
+    )
+
+    if db_costume:
+        raise HTTPException(400, detail='Costume already registered.')
+    
+    db_costume = Costume(
+        name=costume.name,
+        description=costume.description,
+        fee=costume.fee,
+        availability=costume.availability
+    )
+
+    session.add(db_costume)
+    session.commit()
+    session.refresh(db_costume)
+
+    return db_costume
+
+
+@router.put('/{costume_id}', response_model=CostumeOutput)
+def update_costume(
+    session: SessionDep,
+    current_employee: CurrentEmployee,
+    costume: CostumeInput,
+    costume_id: int,
+):
+    db_costume = session.scalar(
+        select(Costume).where(Costume.id == costume_id)
+    )
+
+    if not db_costume:
+        raise HTTPException(404, detail='Costume not registered.')
+
+    db_costume.name = costume.name
+    db_costume.description = costume.description
+    db_costume.fee = costume.fee
+    db_costume.availability = costume.availability
+    session.commit()
+    session.refresh(db_costume)
+
+    return db_costume

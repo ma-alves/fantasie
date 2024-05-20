@@ -1,5 +1,9 @@
 from typing import Annotated
 
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
 from fantasie.database import get_session
 from fantasie.models import Employee
 from fantasie.schemas import (
@@ -10,9 +14,6 @@ from fantasie.schemas import (
 )
 from fantasie.security import get_password_hash, get_current_employee
 
-from fastapi import APIRouter,Depends, HTTPException
-from sqlalchemy import select
-from sqlalchemy.orm import Session
 
 router = APIRouter(prefix='/employees', tags=['employees'])
 
@@ -34,6 +35,7 @@ def read_employee(session: SessionDep, employee_id: int):
     employee = session.scalar(
         select(Employee).where(Employee.id == employee_id)
     )
+    
     if not employee:
         raise HTTPException(404, detail='Employee not registered.')
     

@@ -1,17 +1,14 @@
-from typing import Annotated
-
-from fantasie.database import get_session
 from fantasie.schemas import Message
-from .routes import employees, auth
+from fantasie.routes import employees, auth, costumes
 
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
+
 
 app = FastAPI()
-SessionDep = Annotated[Session, Depends(get_session)]
 
-app.include_router(employees.router)
 app.include_router(auth.router)
+app.include_router(employees.router)
+app.include_router(costumes.router)
 
 
 @app.get('/', response_model=Message, status_code=200)

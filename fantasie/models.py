@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from enum import Enum
 from typing import List, Optional
 
 from sqlalchemy import String, ForeignKey
@@ -14,6 +15,11 @@ class Base(DeclarativeBase):
     pass
 
 
+class CostumeAvailability(str, Enum):
+    AVAILABLE = 'available'
+    UNAVAILABLE = 'unavailable'
+
+
 class Costume(Base):
     __tablename__ = 'costumes'
 
@@ -21,7 +27,7 @@ class Costume(Base):
     name: Mapped[str]
     description: Mapped[str]
     fee: Mapped[float]
-    available: Mapped[bool]
+    availability: Mapped[CostumeAvailability]
 
     rental: Mapped[List["Rental"]] = relationship(back_populates='costumes')
 

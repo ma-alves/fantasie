@@ -1,8 +1,9 @@
 from random import randint
 
 import factory
+import factory.fuzzy
 
-from fantasie.models import Costume, Customer, Employee
+from fantasie.models import Costume, CostumeAvailability, Customer, Employee
 
 
 class EmployeeFactory(factory.Factory):
@@ -24,7 +25,7 @@ class CostumeFactory(factory.Factory):
     name = factory.Faker('name', locale='pt_BR')
     description = factory.Faker('text')
     fee = float(randint(0,1000))
-    available = factory.Faker('boolean', chance_of_getting_true=50)
+    availability = factory.fuzzy.FuzzyChoice(CostumeAvailability)
 
 
 class CustomerFactory(factory.Factory):

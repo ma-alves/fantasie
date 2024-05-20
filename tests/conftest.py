@@ -10,7 +10,7 @@ from fantasie.main import app
 from fantasie.models import Base
 from fantasie.security import get_password_hash
 
-from factories import EmployeeFactory
+from factories import CostumeFactory, EmployeeFactory
 
 
 @pytest.fixture
@@ -73,3 +73,14 @@ def token(client: TestClient, employee):
         data={'username': employee.email, 'password': employee.clean_password},
     )
     return response.json()['access_token']
+
+
+@pytest.fixture
+def costume(test_session: Session):
+    new_costume = CostumeFactory()
+
+    test_session.add(new_costume)
+    test_session.commit()
+    test_session.refresh(new_costume)
+
+    return new_costume

@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from fantasie.models import Costume, Customer, Employee, Rental
+from fantasie.models import Costume, CostumeAvailability, Customer, Employee, Rental
 from factories import CostumeFactory, CustomerFactory, EmployeeFactory
 
 
@@ -18,7 +18,7 @@ def test_create_costume(test_session: Session):
     assert costume.name == costume.name
     assert costume.description == costume.description
     assert costume.fee == costume.fee
-    assert costume.available is True or costume.available is False
+    assert costume.availability == CostumeAvailability.AVAILABLE or costume.availability == CostumeAvailability.UNAVAILABLE
 
 
 def test_create_employee(test_session: Session):
