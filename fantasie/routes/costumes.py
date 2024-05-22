@@ -6,12 +6,7 @@ from sqlalchemy.orm import Session
 
 from fantasie.database import get_session
 from fantasie.models import CostumeAvailability, Costume, Employee
-from fantasie.schemas import (
-    CostumeInput,
-    CostumeList,
-    CostumeOutput,
-    Message
-)
+from fantasie.schemas import CostumeSchema, CostumeList, Message
 from fantasie.security import get_current_employee
 
 
@@ -21,81 +16,94 @@ CurrentEmployee = Annotated[Employee, Depends(get_current_employee)]
 SessionDep = Annotated[Session, Depends(get_session)]
 
 
+def query_costume_by_id(session: SessionDep, costume_id):
+	query_db_costume = session.scalar(
+		select(Costume).where(Costume.id == costume_id)
+	)
+
+	if not query_db_costume:
+		raise HTTPException(404, detail='Costume not registered.')
+
+	return query_db_costume
+
+
 @router.get('/', response_model=CostumeList)
 def get_costumes(
-    session: SessionDep,
-    availability: CostumeAvailability = Query(None),
-    skip: int = Query(None),
-    limit: int = Query(None),
-    ):
-    query = select(Costume)
+	session: SessionDep,
+	availability: CostumeAvailability = Query(None),
+	skip: int = Query(None),
+	limit: int = Query(None),
+):
+	query = select(Costume)
 
-    if availability:
-        query = query.filter(Costume.availability == availability)
-    
-    costumes = session.scalars(query.offset(skip).limit(limit)).all()
+	if availability:
+		query = query.filter(Costume.availability == availability)
 
-    return {'costumes': costumes}
+	costumes = session.scalars(query.offset(skip).limit(limit)).all()
+
+	return {'costumes': costumes}
 
 
-@router.get('/{costume_id}', response_model=CostumeOutput)
+@router.get('/{costume_id}', response_model=CostumeSchema)
 def get_costume(session: SessionDep, costume_id: int):
-    costume = session.scalar(
-        select(Costume).where(Costume.id == costume_id)
-    )
-
-    if not costume:
-        raise HTTPException(404, detail='Costume not registered.')
-
-    return costume
+	return query_costume_by_id(session, costume_id)
 
 
-@router.post('/', response_model=CostumeOutput, status_code=201)
+@router.post('/', response_model=CostumeSchema, status_code=201)
 def create_costume(
-    session: SessionDep,
-    current_employee: CurrentEmployee,
-    costume: CostumeInput
+	session: SessionDep,
+	current_employee: CurrentEmployee,
+	costume: CostumeSchema,
 ):
-    db_costume = session.scalar(
-        select(Costume).where(Costume.name == costume.name)
-    )
+	db_costume = session.scalar(
+		select(Costume).where(Costume.name == costume.name)
+	)
 
-    if db_costume:
-        raise HTTPException(400, detail='Costume already registered.')
-    
-    db_costume = Costume(
-        name=costume.name,
-        description=costume.description,
-        fee=costume.fee,
-        availability=costume.availability
-    )
+	if db_costume:
+		raise HTTPException(400, detail='Costume already registered.')
 
-    session.add(db_costume)
-    session.commit()
-    session.refresh(db_costume)
+	db_costume = Costume(
+		name=costume.name,
+		description=costume.description,
+		fee=costume.fee,
+		availability=costume.availability,
+	)
 
-    return db_costume
+	session.add(db_costume)
+	session.commit()
+	session.refresh(db_costume)
+
+	return db_costume
 
 
-@router.put('/{costume_id}', response_model=CostumeOutput)
+@router.put('/{costume_id}', response_model=CostumeSchema)
 def update_costume(
-    session: SessionDep,
-    current_employee: CurrentEmployee,
-    costume: CostumeInput,
-    costume_id: int,
+	session: SessionDep,
+	current_employee: CurrentEmployee,
+	costume: CostumeSchema,
+	costume_id: int,
 ):
-    db_costume = session.scalar(
-        select(Costume).where(Costume.id == costume_id)
-    )
+	db_costume = query_costume_by_id(session, costume_id)
 
-    if not db_costume:
-        raise HTTPException(404, detail='Costume not registered.')
+	db_costume.name = costume.name
+	db_costume.description = costume.description
+	db_costume.fee = costume.fee
+	db_costume.availability = costume.availability
+	session.commit()
+	session.refresh(db_costume)
 
-    db_costume.name = costume.name
-    db_costume.description = costume.description
-    db_costume.fee = costume.fee
-    db_costume.availability = costume.availability
-    session.commit()
-    session.refresh(db_costume)
+	return db_costume
 
-    return db_costume
+
+@router.delete('/{costume_id}', response_model=Message)
+def delete_costume(
+	current_employee: CurrentEmployee,
+	session: SessionDep,
+	costume_id: int,
+):
+	db_costume = query_costume_by_id(session, costume_id)
+
+	session.delete(db_costume)
+	session.commit()
+
+	return {'message': 'Costume deleted.'}

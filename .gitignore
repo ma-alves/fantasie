@@ -163,3 +163,4 @@ cython_debug/
 # else
 database.db
 notes.txt
+.ruff_cache

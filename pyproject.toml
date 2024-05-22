@@ -18,3 +18,12 @@ pythonpath = "."
 run = 'uvicorn fantasie.main:app --reload'
 test = 'pytest -s -x --cov=fantasie -vv'
 post_test = 'coverage html'
+ruff = 'ruff format'
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.format]
+preview = true
+quote-style = 'single'
+indent-style = 'tab'
