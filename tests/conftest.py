@@ -55,7 +55,7 @@ def employee(test_session: Session):
 @pytest.fixture
 def other_employee(test_session: Session):
 	password = 'test1234'
-	test_employee = EmployeeFactory(password=get_password_hash(password))
+	test_employee = EmployeeFactory(password=get_password_hash(password), is_admin=False)
 
 	test_session.add(test_employee)
 	test_session.commit()
@@ -71,6 +71,15 @@ def token(client: TestClient, employee):
 	response = client.post(
 		'/auth/token',
 		data={'username': employee.email, 'password': employee.clean_password},
+	)
+	return response.json()['access_token']
+
+
+@pytest.fixture
+def other_token(client: TestClient, other_employee):
+	response = client.post(
+		'/auth/token',
+		data={'username': other_employee.email, 'password': other_employee.clean_password},
 	)
 	return response.json()['access_token']
 

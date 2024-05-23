@@ -41,9 +41,12 @@ def read_employee(session: SessionDep, employee_id: int):
 
 	return employee
 
-
+# adicionar 'is_admin' em current_employee
 @router.post('/', response_model=EmployeeOutput, status_code=201)
 def create_employee(employee: EmployeeInput, session: SessionDep):
+	'''
+	Open endpoint so anyone can test the API's permissions.
+	'''
 	db_employee = session.scalar(
 		select(Employee).where(Employee.email == employee.email)
 	)
@@ -57,6 +60,7 @@ def create_employee(employee: EmployeeInput, session: SessionDep):
 		email=employee.email,
 		password=hashed_password,
 		phone_number=employee.phone_number,
+		is_admin=employee.is_admin
 	)
 
 	session.add(db_employee)
@@ -73,17 +77,25 @@ def update_employee(
 	employee: EmployeeInput,
 	employee_id: int,
 ):
-	if current_employee.id != employee_id:
-		raise HTTPException(status_code=400, detail='Not enough permissions')
+	if current_employee.id != employee_id and current_employee.is_admin is False:
+			raise HTTPException(status_code=400, detail='Not enough permissions')
 
-	current_employee.name = employee.name
-	current_employee.password = get_password_hash(employee.password)
-	current_employee.email = employee.email
-	current_employee.phone_number = employee.phone_number
+	db_employee = session.scalar(
+		select(Employee).where(Employee.id == employee_id)
+	)
+	
+	if not db_employee:
+		raise HTTPException(404, detail='Employee not registered.')
+
+	db_employee.name = employee.name
+	db_employee.password = get_password_hash(employee.password)
+	db_employee.email = employee.email
+	db_employee.phone_number = employee.phone_number
+	db_employee.is_admin = employee.is_admin
 	session.commit()
-	session.refresh(current_employee)
+	session.refresh(db_employee)
 
-	return current_employee
+	return db_employee
 
 
 @router.delete('/{employee_id}', response_model=Message)
@@ -92,10 +104,17 @@ def delete_employee(
 	session: SessionDep,
 	employee_id: int,
 ):
-	if current_employee.id != employee_id:
+	if current_employee.id != employee_id and current_employee.is_admin is False:
 		raise HTTPException(status_code=400, detail='Not enough permissions')
 
-	session.delete(current_employee)
+	db_employee = session.scalar(
+		select(Employee).where(Employee.id == employee_id)
+	)
+
+	if not db_employee:
+		raise HTTPException(404, detail='Employee not registered.')
+
+	session.delete(db_employee)
 	session.commit()
 
 	return {'message': 'Employee deleted.'}

@@ -24,12 +24,15 @@ class EmployeeInput(BaseModel):
 	password: str
 	email: EmailStr
 	phone_number: str
+	is_admin: bool = False
 
 
 class EmployeeOutput(BaseModel):
+	id: int
 	name: str
 	email: EmailStr
 	phone_number: str
+	is_admin: bool
 
 
 class EmployeeList(BaseModel):

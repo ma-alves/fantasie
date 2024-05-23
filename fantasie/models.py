@@ -48,6 +48,7 @@ class Employee(Base):
 	email: Mapped[str]
 	password: Mapped[str]
 	phone_number: Mapped[Optional[str]] = mapped_column(String(11))
+	is_admin: Mapped[bool]
 
 	rental: Mapped[List['Rental']] = relationship(back_populates='employees')
 

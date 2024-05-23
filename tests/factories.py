@@ -15,6 +15,7 @@ class EmployeeFactory(factory.Factory):
 	email = factory.Faker('free_email')
 	password = factory.LazyAttribute(lambda obj: f'{obj.name}1234')
 	phone_number = factory.Faker('phone_number')
+	is_admin = True
 
 
 class CostumeFactory(factory.Factory):
