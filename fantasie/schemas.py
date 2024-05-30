@@ -1,5 +1,7 @@
-from pydantic import BaseModel, EmailStr
+from datetime import datetime, timedelta
 from typing import List
+
+from pydantic import BaseModel, EmailStr
 
 from fantasie.models import CostumeAvailability
 
@@ -40,7 +42,15 @@ class EmployeeList(BaseModel):
 
 
 # Costumes
-class CostumeSchema(BaseModel):
+class CostumeInput(BaseModel):
+	name: str
+	description: str
+	fee: float
+	availability: CostumeAvailability
+
+
+class CostumeOutput(BaseModel):
+	id: int
 	name: str
 	description: str
 	fee: float
@@ -48,7 +58,7 @@ class CostumeSchema(BaseModel):
 
 
 class CostumeList(BaseModel):
-	costumes: List[CostumeSchema]
+	costumes: List[CostumeOutput]
 
 
 # Customers
@@ -62,3 +72,21 @@ class CustomerSchema(BaseModel):
 
 class CustomerList(BaseModel):
 	customers: List[CustomerSchema]
+
+
+# Rental
+class RentalSchema(BaseModel):
+	rental_date: datetime
+	return_date: datetime
+	costume: CostumeOutput
+	customer: CustomerSchema
+	employee: EmployeeOutput
+
+
+class RentalList(BaseModel):
+	rental_list: List[RentalSchema]
+
+
+class RentalInput(BaseModel):
+	costume_id: int
+	customer_cpf: int

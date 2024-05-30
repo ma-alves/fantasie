@@ -41,12 +41,13 @@ def read_employee(session: SessionDep, employee_id: int):
 
 	return employee
 
+
 # adicionar 'is_admin' em current_employee
 @router.post('/', response_model=EmployeeOutput, status_code=201)
 def create_employee(employee: EmployeeInput, session: SessionDep):
-	'''
+	"""
 	Open endpoint so anyone can test the API's permissions.
-	'''
+	"""
 	db_employee = session.scalar(
 		select(Employee).where(Employee.email == employee.email)
 	)
@@ -60,7 +61,7 @@ def create_employee(employee: EmployeeInput, session: SessionDep):
 		email=employee.email,
 		password=hashed_password,
 		phone_number=employee.phone_number,
-		is_admin=employee.is_admin
+		is_admin=employee.is_admin,
 	)
 
 	session.add(db_employee)
@@ -77,13 +78,16 @@ def update_employee(
 	employee: EmployeeInput,
 	employee_id: int,
 ):
-	if current_employee.id != employee_id and current_employee.is_admin is False:
-			raise HTTPException(status_code=400, detail='Not enough permissions')
+	if (
+		current_employee.id != employee_id
+		and current_employee.is_admin is False
+	):
+		raise HTTPException(status_code=400, detail='Not enough permissions')
 
 	db_employee = session.scalar(
 		select(Employee).where(Employee.id == employee_id)
 	)
-	
+
 	if not db_employee:
 		raise HTTPException(404, detail='Employee not registered.')
 
@@ -104,7 +108,10 @@ def delete_employee(
 	session: SessionDep,
 	employee_id: int,
 ):
-	if current_employee.id != employee_id and current_employee.is_admin is False:
+	if (
+		current_employee.id != employee_id
+		and current_employee.is_admin is False
+	):
 		raise HTTPException(status_code=400, detail='Not enough permissions')
 
 	db_employee = session.scalar(

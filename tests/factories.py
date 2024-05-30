@@ -1,9 +1,16 @@
+from datetime import datetime, timedelta
 from random import randint
 
 import factory
 import factory.fuzzy
 
-from fantasie.models import Costume, CostumeAvailability, Customer, Employee
+from fantasie.models import (
+	Costume,
+	CostumeAvailability,
+	Customer,
+	Employee,
+	Rental,
+)
 
 
 class EmployeeFactory(factory.Factory):
@@ -39,3 +46,21 @@ class CustomerFactory(factory.Factory):
 	email = factory.Faker('free_email')
 	phone_number = factory.Faker('phone_number')
 	address = factory.Faker('address', locale='pt_BR')
+
+
+class RentalFactory(factory.Factory):
+	class Meta:
+		model = Rental
+
+	employees = factory.SubFactory(EmployeeFactory)
+	customers = factory.SubFactory(CustomerFactory)
+	costumes = factory.SubFactory(CostumeFactory)
+
+	id = factory.Sequence(lambda n: n + 1)
+	employee_id = factory.SelfAttribute('employees.id')
+	customer_id = factory.SelfAttribute('customers.id')
+	costume_id = factory.SelfAttribute('costumes.id')
+	rental_date = datetime.now()
+	return_date = factory.LazyAttribute(
+		lambda obj: obj.rental_date + timedelta(days=7)
+	)

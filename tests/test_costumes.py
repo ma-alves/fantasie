@@ -11,6 +11,7 @@ def test_get_costume(client: TestClient, costume):
 	response = client.get(f'/costumes/{costume.id}')
 	assert response.status_code == 200
 	assert response.json() == {
+		'id': costume.id,
 		'name': f'{costume.name}',
 		'description': f'{costume.description}',
 		'fee': costume.fee,
@@ -37,6 +38,7 @@ def test_create_costume(client: TestClient, employee, token):
 	)
 	assert response.status_code == 201
 	assert response.json() == {
+		'id': 1,
 		'name': 'Dinossauro',
 		'description': 'Um Tiranossauro Rex cabuloso!',
 		'fee': 59.90,
@@ -83,6 +85,7 @@ def test_update_costume(client: TestClient, costume, employee, token):
 	)
 	assert response.status_code == 200
 	assert response.json() == {
+		'id': costume.id,
 		'name': 'Updated name',
 		'description': 'Updated description',
 		'fee': 76.90,

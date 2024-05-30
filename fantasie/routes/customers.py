@@ -34,7 +34,9 @@ def get_customers(
 def get_customer(
 	session: SessionDep, current_employee: CurrentEmployee, customer_cpf: str
 ):
-	db_customer = session.scalar(select(Customer).where(Customer.cpf == customer_cpf))
+	db_customer = session.scalar(
+		select(Customer).where(Customer.cpf == customer_cpf)
+	)
 
 	if not db_customer:
 		raise HTTPException(404, detail='Customer not registered.')
@@ -69,7 +71,6 @@ def create_customer(
 	return db_customer
 
 
-
 @router.put('/{customer_cpf}', response_model=CustomerSchema)
 def update_customer(
 	session: SessionDep,
@@ -80,10 +81,10 @@ def update_customer(
 	db_customer = session.scalar(
 		select(Customer).where(Customer.cpf == customer_cpf)
 	)
-	
+
 	if not db_customer:
 		raise HTTPException(404, detail='Customer not registered.')
-	
+
 	db_customer.cpf = customer.cpf
 	db_customer.name = customer.name
 	db_customer.email = customer.email
@@ -97,17 +98,15 @@ def update_customer(
 
 @router.delete('/{customer_cpf}', response_model=Message)
 def delete_customer(
-	session: SessionDep,
-	current_employee: CurrentEmployee,
-	customer_cpf: int
+	session: SessionDep, current_employee: CurrentEmployee, customer_cpf: int
 ):
 	db_customer = session.scalar(
 		select(Customer).where(Customer.cpf == customer_cpf)
 	)
-	
+
 	if not db_customer:
 		raise HTTPException(404, detail='Customer not registered.')
-	
+
 	session.delete(db_customer)
 	session.commit()
 

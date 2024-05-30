@@ -1,5 +1,5 @@
 from fantasie.schemas import Message
-from fantasie.routes import employees, auth, costumes, customers
+from fantasie.routes import employees, auth, costumes, customers, rental
 
 from fastapi import FastAPI
 
@@ -10,6 +10,7 @@ app.include_router(auth.router)
 app.include_router(employees.router)
 app.include_router(costumes.router)
 app.include_router(customers.router)
+app.include_router(rental.router)
 
 
 @app.get('/', response_model=Message, status_code=200)

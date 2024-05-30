@@ -7,10 +7,15 @@ from sqlalchemy.pool import StaticPool
 
 from fantasie.database import get_session
 from fantasie.main import app
-from fantasie.models import Base
+from fantasie.models import Base, CostumeAvailability
 from fantasie.security import get_password_hash
 
-from factories import CostumeFactory, CustomerFactory, EmployeeFactory
+from factories import (
+	CostumeFactory,
+	CustomerFactory,
+	EmployeeFactory,
+	RentalFactory,
+)
 
 
 @pytest.fixture
@@ -55,7 +60,9 @@ def employee(test_session: Session):
 @pytest.fixture
 def other_employee(test_session: Session):
 	password = 'test1234'
-	test_employee = EmployeeFactory(password=get_password_hash(password), is_admin=False)
+	test_employee = EmployeeFactory(
+		password=get_password_hash(password), is_admin=False
+	)
 
 	test_session.add(test_employee)
 	test_session.commit()
@@ -79,7 +86,10 @@ def token(client: TestClient, employee):
 def other_token(client: TestClient, other_employee):
 	response = client.post(
 		'/auth/token',
-		data={'username': other_employee.email, 'password': other_employee.clean_password},
+		data={
+			'username': other_employee.email,
+			'password': other_employee.clean_password,
+		},
 	)
 	return response.json()['access_token']
 
@@ -87,6 +97,17 @@ def other_token(client: TestClient, other_employee):
 @pytest.fixture
 def costume(test_session: Session):
 	test_costume = CostumeFactory()
+
+	test_session.add(test_costume)
+	test_session.commit()
+	test_session.refresh(test_costume)
+
+	return test_costume
+
+
+@pytest.fixture
+def available_costume(test_session: Session):
+	test_costume = CostumeFactory(availability=CostumeAvailability.AVAILABLE)
 
 	test_session.add(test_costume)
 	test_session.commit()
@@ -104,3 +125,14 @@ def customer(test_session: Session):
 	test_session.refresh(test_customer)
 
 	return test_customer
+
+
+@pytest.fixture
+def rental(test_session: Session):
+	test_rental = RentalFactory()
+
+	test_session.add(test_rental)
+	test_session.commit()
+	test_session.refresh(test_rental)
+
+	return test_rental

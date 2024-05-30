@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from fantasie.database import get_session
 from fantasie.models import CostumeAvailability, Costume, Employee
-from fantasie.schemas import CostumeSchema, CostumeList, Message
+from fantasie.schemas import CostumeInput, CostumeList, CostumeOutput, Message
 from fantasie.security import get_current_employee
 
 
@@ -44,16 +44,16 @@ def get_costumes(
 	return {'costumes': costumes}
 
 
-@router.get('/{costume_id}', response_model=CostumeSchema)
+@router.get('/{costume_id}', response_model=CostumeOutput)
 def get_costume(session: SessionDep, costume_id: int):
 	return query_costume_by_id(session, costume_id)
 
 
-@router.post('/', response_model=CostumeSchema, status_code=201)
+@router.post('/', response_model=CostumeOutput, status_code=201)
 def create_costume(
 	session: SessionDep,
 	current_employee: CurrentEmployee,
-	costume: CostumeSchema,
+	costume: CostumeInput,
 ):
 	db_costume = session.scalar(
 		select(Costume).where(Costume.name == costume.name)
@@ -76,11 +76,11 @@ def create_costume(
 	return db_costume
 
 
-@router.put('/{costume_id}', response_model=CostumeSchema)
+@router.put('/{costume_id}', response_model=CostumeOutput)
 def update_costume(
 	session: SessionDep,
 	current_employee: CurrentEmployee,
-	costume: CostumeSchema,
+	costume: CostumeInput,
 	costume_id: int,
 ):
 	db_costume = query_costume_by_id(session, costume_id)

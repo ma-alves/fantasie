@@ -4,7 +4,7 @@ from freezegun import freeze_time
 def test_get_token(client, employee):
 	response = client.post(
 		'/auth/token',
-		data={'username': employee.email, 'password': employee.clean_password}
+		data={'username': employee.email, 'password': employee.clean_password},
 	)
 	token = response.json()
 
