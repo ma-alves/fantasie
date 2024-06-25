@@ -117,6 +117,17 @@ def available_costume(test_session: Session):
 
 
 @pytest.fixture
+def unavailable_costume(test_session: Session):
+	test_costume = CostumeFactory(availability=CostumeAvailability.UNAVAILABLE)
+
+	test_session.add(test_costume)
+	test_session.commit()
+	test_session.refresh(test_costume)
+
+	return test_costume
+
+
+@pytest.fixture
 def customer(test_session: Session):
 	test_customer = CustomerFactory()
 

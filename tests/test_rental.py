@@ -42,11 +42,47 @@ def test_create_rental(client: TestClient, employee, token, available_costume, c
 			'customer_cpf': customer.cpf
 		}
 	)
-	print(response.json())
 	assert response.status_code == 201
 	assert response.json()['costume']['id'] == available_costume.id
 	assert response.json()['customer']['cpf'] == customer.cpf
 	assert response.json()['employee']['id'] == employee.id
 
 
-# test create rental errors
+def test_create_rental_unavailable_costume(client: TestClient, employee, token, unavailable_costume, customer):
+	response = client.post(
+		'/rental',
+		headers={'Authorization': f'Bearer {token}'},
+		json={
+			'costume_id': unavailable_costume.id,
+			'customer_cpf': customer.cpf
+		}
+	)
+	assert response.status_code == 400
+	assert response.json() == {'detail': 'Costume unavailable.'}
+
+
+def test_create_rental_costume_not_registered(client: TestClient, employee, token, customer):
+	response = client.post(
+		'/rental',
+		headers={'Authorization': f'Bearer {token}'},
+		json={
+			'costume_id': -1,
+			'customer_cpf': customer.cpf
+		}
+	)
+	assert response.status_code == 400
+	assert response.json() == {'detail': 'Costume not registered.'}
+
+
+def test_create_rental_customer_not_registered(client: TestClient, available_costume, employee, token):
+	response = client.post(
+		'/rental',
+		headers={'Authorization': f'Bearer {token}'},
+		json={
+			'costume_id': available_costume.id,
+			'customer_cpf': -1
+		}
+	)
+	assert response.status_code == 400
+	assert response.json() == {'detail': 'Customer not registered.'}
+	
