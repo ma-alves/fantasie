@@ -90,3 +90,8 @@ class RentalList(BaseModel):
 class RentalInput(BaseModel):
 	costume_id: int
 	customer_cpf: int
+
+
+class RentalPatch(BaseModel):
+	rental_date: datetime | None = datetime.now()
+	return_date: datetime | None = datetime.now() + timedelta(days=7)
