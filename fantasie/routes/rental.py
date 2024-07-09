@@ -108,17 +108,22 @@ def create_rental(
 
 @router.patch('/{rental_id}', response_model=RentalSchema)
 def patch_rental(
-	session: SessionDep, current_employee: CurrentEmployee, rental_id: int, rental: RentalPatch
+	session: SessionDep,
+	current_employee: CurrentEmployee,
+	rental_id: int,
+	rental: RentalPatch,
 ):
 	db_rental = session.scalar(select(Rental).where(Rental.id == rental_id))
 	if not db_rental:
 		raise HTTPException(404, detail='Rental not registered.')
-	
-	for key,value in rental.model_dump(exclude_unset=True).items():
+
+	for key, value in rental.model_dump(exclude_unset=True).items():
 		setattr(db_rental, key, value)
 
 	if db_rental.return_date < db_rental.rental_date:
-		raise HTTPException(400, detail='Rental date can\'t be later than return date.')
+		raise HTTPException(
+			400, detail="Rental date can't be later than return date."
+		)
 
 	session.add(db_rental)
 	session.commit()
@@ -137,7 +142,7 @@ def delete_rental(
 
 	if not db_rental:
 		raise HTTPException(404, detail='Rental not registered.')
-	
+
 	# Updating unavailable costume to available
 	db_costume = session.scalar(
 		select(Costume).where(Costume.id == db_rental.costume_id)

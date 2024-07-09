@@ -42,4 +42,5 @@ starlette==0.37.2
 taskipy==1.12.2
 tomli==2.0.1
 typing_extensions==4.11.0
+tzdata==2024.1
 uvicorn==0.29.0
