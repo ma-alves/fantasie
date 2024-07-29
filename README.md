@@ -1,9 +1,7 @@
 # Fantasie
----
 Fantasie is a RESTful API for costume rental with JWT Authentication using Python, FastAPI and SQLite3 as its core technologies. It's main purpose is to be used as a CRUD system by the employees to manage the rental registries.
 
 ## Tech Stack
----
 - [FastAPI](https://fastapi.tiangolo.com/) - Web Framework
 - [SQLite3](https://www.sqlite.org/index.html) - Database
 - [SQLAlchemy](https://www.sqlalchemy.org/) - SQL Toolkit and ORM
@@ -14,7 +12,6 @@ Fantasie is a RESTful API for costume rental with JWT Authentication using Pytho
 - [Alembic](https://alembic.sqlalchemy.org/en/latest/) - Migrations
 
 ## Getting Started With Docker
----
 1. Clone this repository:
 `git clone https://github.com/ma-alves/fantasie.git`
 2. Copy the environment variables to .env and change the values:
