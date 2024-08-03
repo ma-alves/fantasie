@@ -11,7 +11,7 @@ Fantasie is a RESTful API for costume rental with JWT Authentication using Pytho
 - [PyJWT](https://pypi.org/project/PyJWT/) - Authentication
 - [Alembic](https://alembic.sqlalchemy.org/en/latest/) - Migrations
 
-## Getting Started In A Docker Container
+## Getting Started
 1. Clone this repository:\
 `git clone https://github.com/ma-alves/fantasie.git`
 2. Copy the environment variables to .env and change the values:\
