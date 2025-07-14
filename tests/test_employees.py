@@ -1,11 +1,12 @@
-from fastapi.testclient import TestClient
+from http import HTTPStatus
 
+from fastapi.testclient import TestClient
 from fantasie.models import Employee
 
 
 def test_read_employees(client: TestClient):
 	response = client.get('/employees')
-	assert response.status_code == 200
+	assert response.status_code == HTTPStatus.OK
 	assert response.json() == {'employees': []}
 
 
@@ -20,7 +21,7 @@ def test_create_employee(client: TestClient):
 			'is_admin': False,
 		},
 	)
-	assert response.status_code == 201
+	assert response.status_code == HTTPStatus.CREATED
 	assert response.json() == {
 		'id': 1,
 		'name': 'matheus',
@@ -51,14 +52,14 @@ def test_create_employee_already_exists(client: TestClient):
 			'is_admin': False,
 		},
 	)
-	assert first_response.status_code == 201
-	assert second_response.status_code == 400
+	assert first_response.status_code == HTTPStatus.CREATED
+	assert second_response.status_code == HTTPStatus.BAD_REQUEST
 	assert second_response.json() == {'detail': 'Employee already registered.'}
 
 
 def test_read_employee(client: TestClient, employee):
 	response = client.get(f'/employees/{employee.id}')
-	assert response.status_code == 200
+	assert response.status_code == HTTPStatus.OK
 	assert response.json() == {
 		'id': employee.id,
 		'name': f'{employee.name}',
@@ -69,8 +70,8 @@ def test_read_employee(client: TestClient, employee):
 
 
 def test_read_employee_not_registered(client: TestClient):
-	response = client.get(f'/employees/404')
-	assert response.status_code == 404
+	response = client.get('/employees/404')
+	assert response.status_code == HTTPStatus.NOT_FOUND
 	assert response.json() == {'detail': 'Employee not registered.'}
 
 
@@ -86,7 +87,7 @@ def test_update_employee(client: TestClient, employee: Employee, token: str):
 			'is_admin': True,
 		},
 	)
-	assert response.status_code == 200
+	assert response.status_code == HTTPStatus.OK
 	assert response.json() == {
 		'id': employee.id,
 		'name': f'{employee.name}',
@@ -100,7 +101,7 @@ def test_update_employee_no_permission(
 	client: TestClient, other_employee: Employee, other_token: str
 ):
 	response = client.put(
-		f'/employees/400',
+		'/employees/400',
 		headers={'Authorization': f'Bearer {other_token}'},
 		json={
 			'name': 'yasmim',
@@ -110,7 +111,7 @@ def test_update_employee_no_permission(
 			'is_admin': True,
 		},
 	)
-	assert response.status_code == 400
+	assert response.status_code == HTTPStatus.BAD_REQUEST
 	assert response.json() == {'detail': 'Not enough permissions'}
 
 
@@ -119,7 +120,7 @@ def test_delete_employee(client: TestClient, employee: Employee, token: str):
 		f'/employees/{employee.id}',
 		headers={'Authorization': f'Bearer {token}'},
 	)
-	assert response.status_code == 200
+	assert response.status_code == HTTPStatus.OK
 	assert response.json() == {'message': 'Employee deleted.'}
 
 
@@ -133,5 +134,5 @@ def test_delete_employee_no_permission(
 		f'/employees/{employee.id}',
 		headers={'Authorization': f'Bearer {other_token}'},
 	)
-	assert response_delete.status_code == 400
+	assert response_delete.status_code == HTTPStatus.BAD_REQUEST
 	assert response_delete.json() == {'detail': 'Not enough permissions'}

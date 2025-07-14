@@ -1,13 +1,12 @@
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from enum import Enum
 from typing import List, Optional
 
 from sqlalchemy import String, ForeignKey
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, registry
 
 
-class Base(DeclarativeBase):
-	pass
+table_registry = registry()
 
 
 class CostumeAvailability(str, Enum):
@@ -15,7 +14,8 @@ class CostumeAvailability(str, Enum):
 	UNAVAILABLE = 'unavailable'
 
 
-class Costume(Base):
+@table_registry.mapped_as_dataclass
+class Costume:
 	__tablename__ = 'costumes'
 
 	id: Mapped[int] = mapped_column(primary_key=True)
@@ -27,7 +27,8 @@ class Costume(Base):
 	rental: Mapped[List['Rental']] = relationship(back_populates='costumes')
 
 
-class Customer(Base):
+@table_registry.mapped_as_dataclass
+class Customer:
 	__tablename__ = 'customers'
 
 	id: Mapped[int] = mapped_column(primary_key=True)
@@ -40,7 +41,8 @@ class Customer(Base):
 	rental: Mapped[List['Rental']] = relationship(back_populates='customers')
 
 
-class Employee(Base):
+@table_registry.mapped_as_dataclass
+class Employee:
 	__tablename__ = 'employees'
 
 	id: Mapped[int] = mapped_column(primary_key=True)
@@ -53,7 +55,8 @@ class Employee(Base):
 	rental: Mapped[List['Rental']] = relationship(back_populates='employees')
 
 
-class Rental(Base):
+@table_registry.mapped_as_dataclass
+class Rental:
 	"""Neste formato o cliente não tem relação direta com o funcionário,
 	apenas com o aluguel, que pelo seu registro liga o cliente ao
 	funcionário indiretamente. Essa relação também ocorre da mesma

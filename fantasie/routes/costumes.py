@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -49,7 +50,7 @@ def get_costume(session: SessionDep, costume_id: int):
 	return query_costume_by_id(session, costume_id)
 
 
-@router.post('/', response_model=CostumeOutput, status_code=201)
+@router.post('/', response_model=CostumeOutput, status_code=HTTPStatus.CREATED)
 def create_costume(
 	session: SessionDep,
 	current_employee: CurrentEmployee,

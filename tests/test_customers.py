@@ -26,7 +26,7 @@ def test_get_customer(client: TestClient, customer, employee, token):
 
 def test_get_customer_not_registered(client: TestClient, employee, token):
 	response = client.get(
-		f'/customers/404', headers={'Authorization': f'Bearer {token}'}
+		'/customers/404', headers={'Authorization': f'Bearer {token}'}
 	)
 	assert response.status_code == 404
 	assert response.json() == {'detail': 'Customer not registered.'}
@@ -109,7 +109,7 @@ def test_update_customer(client: TestClient, customer, employee, token):
 
 def test_update_customer_not_registered(client: TestClient, employee, token):
 	response = client.put(
-		f'/customers/404',
+		'/customers/404',
 		headers={'Authorization': f'Bearer {token}'},
 		json={
 			'cpf': '00900900911',
@@ -134,7 +134,7 @@ def test_delete_customer(client: TestClient, customer, employee, token):
 
 def test_delete_customer_not_registered(client: TestClient, employee, token):
 	response = client.delete(
-		f'/customers/404',
+		'/customers/404',
 		headers={'Authorization': f'Bearer {token}'},
 	)
 	assert response.status_code == 404

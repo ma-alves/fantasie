@@ -9,7 +9,6 @@ from fantasie.database import get_session
 from fantasie.main import app
 from fantasie.models import Base, CostumeAvailability
 from fantasie.security import get_password_hash
-from fantasie.settings import Settings
 
 from factories import (
 	CostumeFactory,

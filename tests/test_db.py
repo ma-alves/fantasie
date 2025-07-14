@@ -6,7 +6,6 @@ from fantasie.models import (
 	CostumeAvailability,
 	Customer,
 	Employee,
-	Rental,
 )
 from factories import CostumeFactory, CustomerFactory, EmployeeFactory
 
