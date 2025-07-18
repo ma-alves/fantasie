@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from fastapi.testclient import TestClient
 
 
@@ -20,7 +21,7 @@ def test_get_costume(client: TestClient, costume):
 
 
 def test_get_costume_not_registered(client: TestClient):
-	response = client.get('/costumes/404')
+	response = client.get(f'/costumes/404')
 	assert response.status_code == 404
 	assert response.json() == {'detail': 'Costume not registered.'}
 
@@ -68,7 +69,7 @@ def test_create_costume_already_exists(client: TestClient, employee, token):
 		},
 	)
 	assert first_response.status_code == 201
-	assert second_response.status_code == 400
+	assert second_response.status_code == HTTPStatus.CONFLICT
 	assert second_response.json() == {'detail': 'Costume already registered.'}
 
 
@@ -95,7 +96,7 @@ def test_update_costume(client: TestClient, costume, employee, token):
 
 def test_update_costume_not_registered(client: TestClient, employee, token):
 	response = client.put(
-		'/costumes/404',
+		f'/costumes/404',
 		headers={'Authorization': f'Bearer {token}'},
 		json={
 			'name': 'Updated name',
@@ -119,7 +120,7 @@ def test_delete_costume(client: TestClient, costume, employee, token):
 
 def test_delete_costume_not_registered(client: TestClient, employee, token):
 	response = client.delete(
-		'/costumes/404',
+		f'/costumes/404',
 		headers={'Authorization': f'Bearer {token}'},
 	)
 	assert response.status_code == 404

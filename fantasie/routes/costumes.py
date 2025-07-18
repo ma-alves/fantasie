@@ -23,7 +23,9 @@ def query_costume_by_id(session: SessionDep, costume_id):
 	)
 
 	if not query_db_costume:
-		raise HTTPException(404, detail='Costume not registered.')
+		raise HTTPException(
+			HTTPStatus.NOT_FOUND, detail='Costume not registered.'
+		)
 
 	return query_db_costume
 
@@ -61,7 +63,9 @@ def create_costume(
 	)
 
 	if db_costume:
-		raise HTTPException(400, detail='Costume already registered.')
+		raise HTTPException(
+			HTTPStatus.CONFLICT, detail='Costume already registered.'
+		)
 
 	db_costume = Costume(
 		name=costume.name,
