@@ -1,5 +1,5 @@
 # Fantasie
-Fantasie is a RESTful API for costume rental with JWT Authentication using Python, FastAPI and SQLite3 as its core technologies. It's main purpose is to be used as a CRUD system by the employees to manage the rental registries.
+Fantasie is a RESTful API for costume rental with JWT Authentication using Python, FastAPI and SQLite3 as its core technologies.
 
 ## Tech Stack
 - [FastAPI](https://fastapi.tiangolo.com/) - Web Framework
